@@ -1,0 +1,171 @@
+<!-- Everything before remains the same in your code until this part: -->
+<script>
+    // ✅ Updated quiz data with Rialo.io blog questions
+    const quizData = [
+        {
+            question: "What is one of the main limitations of current Real‑World Assets (RWAs)?",
+            options: [
+                "They automatically reprice in real time",
+                "They don’t require any third‑party verification",
+                "They behave like slow, clunky replicas of off‑chain counterparts",
+                "They are fully autonomous and don’t need human intervention"
+            ],
+            correct: 2
+        },
+        {
+            question: "Why is Web3 adoption still limited according to Rialo?",
+            options: [
+                "Blockchains are fully integrated with real world services",
+                "All blockchains provide identical user experience",
+                "Web3 apps feel clunky, slow, and disconnected from real world services",
+                "Transaction fees are always zero"
+            ],
+            correct: 2
+        },
+        {
+            question: "Which feature does Rialo provide for real-world data integration?",
+            options: [
+                "Built-in oracle services from a single provider",
+                "A one-line HTTPS call from a smart contract to fetch live data",
+                "Manual off-chain verification only",
+                "No data access at all"
+            ],
+            correct: 1
+        },
+        {
+            question: "Which of the following is NOT listed as a use case for Rialo’s RWAs?",
+            options: [
+                "Tokenized real estate with dynamic yield changes",
+                "Automated invoices and credit lines",
+                "Autonomous royalty streams for IP",
+                "Fully off-chain peer-to-peer lending only"
+            ],
+            correct: 3
+        },
+        {
+            question: "What is one of Rialo’s main design goals?",
+            options: [
+                "To act as a simple sidechain with limited features",
+                "To preserve the fragmentation between Web2 and Web3",
+                "To be a “real-world blockchain” that interacts with real life",
+                "To remove programmability from smart contracts"
+            ],
+            correct: 2
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let selectedOption = -1;
+    let quizCompleted = false;
+
+    function startQuiz() {
+        document.getElementById('start-screen').classList.remove('active');
+        document.getElementById('quiz-screen').classList.add('active');
+        document.getElementById('total-questions').textContent = quizData.length;
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentQuestion >= quizData.length) {
+            showResults();
+            return;
+        }
+
+        const question = quizData[currentQuestion];
+        document.getElementById('current-question').textContent = currentQuestion + 1;
+        document.getElementById('question-text').textContent = question.question;
+
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+
+        question.options.forEach((option, index) => {
+            const optionElement = document.createElement('div');
+            optionElement.className = 'option';
+            optionElement.textContent = option;
+            optionElement.onclick = () => selectOption(index);
+            optionsContainer.appendChild(optionElement);
+        });
+
+        const progress = ((currentQuestion) / quizData.length) * 100;
+        document.getElementById('progress-fill').style.width = progress + '%';
+
+        selectedOption = -1;
+        document.getElementById('next-btn').disabled = true;
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('feedback').className = 'feedback';
+    }
+
+    function selectOption(index) {
+        if (selectedOption !== -1) return;
+
+        selectedOption = index;
+        const options = document.querySelectorAll('.option');
+        const question = quizData[currentQuestion];
+
+        options.forEach((option, i) => {
+            if (i === question.correct) {
+                option.classList.add('correct');
+            } else if (i === selectedOption && i !== question.correct) {
+                option.classList.add('incorrect');
+            }
+            option.style.pointerEvents = 'none';
+        });
+
+        const feedback = document.getElementById('feedback');
+        if (selectedOption === question.correct) {
+            score++;
+            feedback.textContent = '🎉 Correct! Well done!';
+            feedback.className = 'feedback correct';
+        } else {
+            feedback.textContent = `❌ Incorrect. The correct answer is: ${question.options[question.correct]}`;
+            feedback.className = 'feedback incorrect';
+        }
+
+        feedback.style.display = 'block';
+        document.getElementById('next-btn').disabled = false;
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        setTimeout(loadQuestion, 300);
+    }
+
+    function showResults() {
+        document.getElementById('quiz-screen').classList.remove('active');
+        document.getElementById('results-screen').classList.add('active');
+
+        const percentage = Math.round((score / quizData.length) * 100);
+        const scoreCircle = document.getElementById('score-circle');
+
+        document.getElementById('score-percentage').textContent = percentage + '%';
+        document.getElementById('correct-count').textContent = score;
+        document.getElementById('incorrect-count').textContent = quizData.length - score;
+        document.getElementById('total-count').textContent = quizData.length;
+
+        let message = '';
+        if (percentage >= 80) {
+            scoreCircle.className = 'score-circle excellent';
+            message = '🏆 Excellent! You\'re a quiz master!';
+        } else if (percentage >= 60) {
+            scoreCircle.className = 'score-circle good';
+            message = '👏 Good job! You did well!';
+        } else if (percentage >= 40) {
+            scoreCircle.className = 'score-circle average';
+            message = '👍 Not bad! Keep practicing!';
+        } else {
+            scoreCircle.className = 'score-circle poor';
+            message = '💪 Don\'t give up! Try again!';
+        }
+
+        document.getElementById('results-message').textContent = message;
+    }
+
+    function restartQuiz() {
+        currentQuestion = 0;
+        score = 0;
+        selectedOption = -1;
+        document.getElementById('results-screen').classList.remove('active');
+        document.getElementById('start-screen').classList.add('active');
+    }
+</script>
